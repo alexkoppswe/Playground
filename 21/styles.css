@@ -1,0 +1,519 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Add styles to make the start screen and game container look nice */
+.start-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.start-screen label{
+  margin-top: 10px;
+  font-size: 1.1em;
+}
+
+#betting-system-toggle {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+#language-select {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 0.5rem 1rem;
+  border: 2px solid #1b1b1b;
+  border-radius: 1rem;
+  font: 1.1rem Georgia, serif;
+  background-color: #fff;
+  outline: none;
+}
+
+.start-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #dfa737;
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.start-button:hover {
+  background-color: #be8d2d;
+}
+
+.game-container {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+  max-height: 100vh;
+  max-width: 100%;
+  height: auto;
+  width: clamp(700px, 80vw, 1400px);
+  padding: 10px 0;
+  background-color: #34773f;
+  border: 6px solid #312416;
+  border-radius: 15%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: width 0.1s ease;
+}
+@media (max-width: 800px) {
+  .game-container {
+    width: clamp(96vw, 90vw, 700px);
+  }
+}
+
+.dealer-container, .player-container {
+  position: relative;
+  margin: 5px auto;
+  padding: 10px;
+  border-radius: 10px;
+  border: 4px solid transparent;
+  border-color: #c4bf27;
+  background-color: transparent;
+  transition: width 0.8s ease-in-out;
+}
+
+.dealer-container h2, .player-container h2 {
+  font: 1.4em Georgia, serif;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #1b1b1b;
+}
+
+.dealer-container .dealmsg {
+  padding: 1em 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+  color: #747474;
+}
+
+.score-container {
+  display: block;
+  margin: 0 auto;
+  width: fit-content;
+  background-color: #f9f9f9bf;
+  text-align: center;
+  border-radius: 3px;
+}
+
+.dealer-hand-score, .player-hand-score {
+  margin: 0;
+  padding: 4px 8px;
+  text-align: center;
+  font: 1.1em Arial, sans-serif;
+  color: #353535;
+}
+
+.dealer-hand, .player-hand {
+  display: flex;
+  justify-content: center;
+}
+
+@media screen and (max-width: 450px) {
+  .dealer-hand, .player-hand {
+    flex-wrap: wrap;
+  }
+  .dealer-container, .player-container {
+    border: none;
+  }
+}
+
+.card {
+  position: relative;
+  width: 100px;
+  height: 150px;
+  margin: 0 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #1b1b1b;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  font: bold 1.2rem Georgia, serif;
+  color: #333;
+  opacity: 1;
+  transform: translateY(0) scale(0.8);
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.card:after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  border: 4px solid darkseagreen;
+  border-radius: 10px;
+}
+
+.card.deal-animation {
+  opacity: 0;
+  transform: translateY(-50px) scale(1);
+}
+
+.card-rank, .card-rank.bottom {
+  padding: 0.5rem;
+  width: fit-content;
+}
+
+.card-rank span, .card-rank.bottom span {
+  display: inline;
+  width: 100%;
+  line-height: 1.2rem;
+  vertical-align: baseline;
+  padding-bottom: 2px;
+  border-radius: 1px;
+}
+
+.card-rank {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: scaleX(-1) rotateX(180deg);
+}
+
+.card-rank.bottom {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  transform: scaleY(1);
+}
+
+.card-rank.middle {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.725);
+}
+
+.deal-button, .hit-button, .stand-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #dfa737;
+  color: #fcfcfc;
+  text-shadow: 1px 1px 1px #1e1e1ec7;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.deal-button:hover, .hit-button:hover, .stand-button:hover {
+  background-color: #b78729;
+}
+
+.buttons {
+  display: block ruby;
+  margin-top: 10px;
+}
+
+@media screen and (max-width: 450px) {
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background-color: #282828;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+  margin-left: 10px;
+  font-size: 1em;
+  color: #f9f9f9;
+}
+
+.result {
+  height: 1.1em;
+  min-height: 30px;
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #1b1b1b;
+  text-shadow: 1px 1px 1px #9e9e9ec7;
+}
+
+header {
+  background-color: #f0f0f0;
+  text-align: center;
+}
+
+header h1 {
+  margin-bottom: 10px;
+}
+
+h1, h2 {
+  margin: 0 auto;
+  color: #333;
+}
+
+h1 {
+  font-size: 36px;
+  text-align: center;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+.info-box {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #dfd7ca;
+  font: 1.1em Consolas, monospace;
+  color: #1b1b1b;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.info-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-box li {
+  margin-bottom: 10px;
+}
+
+.info-box p {
+  margin-bottom: 20px;
+}
+
+.info-box h2,
+.info-box h3 {
+  margin-top: 0;
+}
+
+.info-box kbd {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+#initial-money {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #000;
+  padding: 5px 15px;
+  margin: 5px 0;
+  outline: none;
+}
+
+/* General Container Styles for Betting UI */
+#betting-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background-color: #282828;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: auto;
+  max-width: 400px;
+}
+
+#betting-container label {
+  margin-right: 10px;
+  font-size: 1em;
+  color: white;
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+}
+
+#bet-amount {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
+  padding: 5px 15px;
+  background-color: #444; /* Darker background for bet amount display */
+  border-radius: 10px;
+  text-align: center;
+}
+
+#add-bet, #place-bet {
+  font-size: 1em;
+  font-weight: bold;
+  padding: 5px 10px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  background-color: #e60000; /* Poker red for bet buttons */
+}
+
+/* Hover effect for buttons */
+#add-bet:hover, #place-bet:hover {
+  background-color: #ff1a1a; /* Lighter red when hovered */
+}
+
+/* Style for disabled buttons */
+#add-bet:disabled, #place-bet:disabled {
+  background-color: #666; /* Dark grey when disabled */
+  cursor: not-allowed;
+}
+
+/* Add a little flair to the bet display */
+#bet-amount {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #fff;
+  font-family: 'Verdana', sans-serif;
+  font-weight: bold;
+  background-color: #3167aa;
+  padding: 5px 15px;
+  border-radius: 2px;
+  text-align: center;
+}
+
+#add-bet {
+  background-color: #cc0000;
+}
+
+#place-bet {
+  background-color: #e60000;
+}
+
+#add-bet:active {
+  background-color: #b30000;
+}
+
+#place-bet:active {
+  background-color: #b30000;
+}
+
+/* Dealer's Money Styling */
+#dealer-money-display, #money-display {
+  font-size: 1em;
+  font-weight: bold;
+  color: #fff;
+  padding: 5px;
+  background-color: #444; /* Similar background for consistency */
+  border-radius: 8px;
+  width: fit-content;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+#deck-container {
+  position: absolute;
+  left: 2vw;
+  top: 16vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#deck-count {
+  margin-top: 5px;
+  font-size: 1.3rem;
+  color: black;
+  font-weight: bold;
+}
+
+#card-deck-container {
+  position: relative;
+  width: 4rem;
+  height: 5rem;
+  background-color: #2E8B57;
+  border: 2px solid #000;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+#card-deck {
+  position: relative;
+  font-size: 4rem;
+  line-height: 5rem;
+  color: white;
+  cursor: cell;
+  transition: transform 0.4s, background-color 0.4s;
+}
+
+#card-deck::before {
+  content: '';
+  position: absolute;
+  top: .7rem;
+  left: .8rem;
+  width: calc(100% - 1.6rem);
+  height: calc(100% - 1.4rem);
+  background-color: white;
+  z-index: -1;
+}
+
+#card-deck:hover {
+  transform: scale(1.1);
+}
+
+/* Styles for hidden card */
+.hidden-card .card-rank {
+  opacity: 0;
+}
+
+.hidden-card::before {
+  content: "🂠";
+  width: 100px;
+  height: 150px;
+  font-size: 150px;
+  line-height: 150px;
+  text-align: center;
+}
+
+.hidden-card.revealed {
+  background-color: white;
+  color: initial;
+}
+
+/* Keyframes for flipping and scaling the card */
+@keyframes reveal-flip {
+  0% {
+    transform: scale(0.9) rotateY(0deg);
+  }
+  60% {
+    transform: scale(1.1) rotateY(70deg);
+  }
+  90% {
+    transform: scale(0.9) rotateY(87deg);
+  }
+  100% {
+    transform: scale(0.8) rotateY(90deg);
+  }
+}
+
+/* Reveal animation class */
+.reveal-animation {
+  animation: reveal-flip 0.55s ease-in-out;
+}

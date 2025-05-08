@@ -1,0 +1,140 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #faf8ef;
+}
+
+#game-container {
+  width: 320px;
+  height: 320px;
+  background: #bbada0;
+  border-radius: 10px;
+  border: 10px solid #776e65;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  grid-gap: 10px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.tile {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #fff;
+  border-radius: 5px;
+  transform: scale(0);
+  animation: spawn 0.2s ease-in-out forwards;
+}
+
+.tile[data-value="2"] {
+  background-color: #eee4da;
+  color: #776e65;
+}
+
+.tile[data-value="4"] {
+  background-color: #ede0c8;
+  color: #776e65;
+}
+
+.tile[data-value="8"] {
+  background-color: #f2b179;
+}
+
+.tile[data-value="16"] {
+  background-color: #f59563;
+}
+
+.tile[data-value="32"] {
+  background-color: #f67c5f;
+}
+
+.tile[data-value="64"] {
+  background-color: #f65e3b;
+}
+
+.tile[data-value="128"] {
+  background-color: #edcf72;
+}
+
+.tile[data-value="256"] {
+  background-color: #edcc61;
+}
+
+.tile[data-value="512"] {
+  background-color: #edc850;
+}
+
+.tile[data-value="1024"] {
+  background-color: #edc53f;
+}
+
+.tile[data-value="2048"] {
+  background-color: #edc22e;
+}
+
+/* Movement animation */
+.tile.move {
+  transition: transform 0.15s ease-in-out;
+}
+
+
+/* Apply merge animation to tiles */
+.tile.merge {
+  animation: merge 0.2s ease-in-out;
+}
+
+/* Grid lines */
+.grid-cell {
+  background: rgba(238, 228, 218, 0.35);
+  border-radius: 5px;
+  width: 100%;
+  height: 100%;
+}
+
+/* Animations */
+@keyframes spawn {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Animations for movement */
+@keyframes move {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(var(--x), var(--y));
+  }
+}
+
+@keyframes merge {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

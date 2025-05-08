@@ -1,0 +1,82 @@
+/*===// CSS File Structure //===
+  1. Reset & Root CSS
+  2. Global styles
+  3. Media player styles
+  
+  * NOTE: this css file is OPTIONAL and a example.
+  * and the dark mode is optional and a example.
+  ============================== */
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  box-sizing: border-box;
+  list-style: none;
+}
+
+/* Root styles */
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+}
+
+/* Styles for dark mode */
+[data-theme='dark'] {
+  --background-color: #1e1e1e;
+  --text-color: #ffffff;
+}
+
+[data-theme='light'] {
+  --background-color: #ffffff;
+  --text-color: #000000;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #121212;
+    --text-color: #ffffff;
+  }
+}
+
+/* Global styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+footer {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  padding: 5px 0;
+  text-align: center;
+  font: 1.1rem Arial, sans-serif;
+  font-weight: bold;
+}
+
+main h1 {
+  margin-bottom: 5px;
+  text-align: center;
+  font: 2.2rem Arial, sans-serif;
+  font-weight: bold;
+}
+
+/* Media player */
+.osp-player {
+  margin: 0 auto;
+  max-width: 70vw;
+  max-height: 90vh;
+  margin-bottom: 10px;
+}
