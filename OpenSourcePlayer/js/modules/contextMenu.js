@@ -16,9 +16,9 @@ let mouseMoveTimer;
 
 // Main function
 export function initializeContextMenu(video, videoPlayerContainer, videoControls) {
-  if (!config.useContextMenu) return;
+  if (!config.useContextMenu || video.tagName !== 'VIDEO') return;
 
-  const aboutUrl = 'github.com/alexkoppswe/OpenSourcePlayer';
+  const aboutUrl = 'github.com/280studios/opensourceplayer';
   const contextMenuHtml = `
     <div class="osp-context" role="menu" aria-label="Context Menu">
       <span class="contextPlayPause" role="menuitem" aria-label="Play/Pause">&#9658; Play/Pause</span>
@@ -26,7 +26,7 @@ export function initializeContextMenu(video, videoPlayerContainer, videoControls
       <span class="contextLoop" role="menuitem" aria-label="Loop">&#8634; Loop</span>
       <span class="contextPip" role="menuitem" aria-label="Picture-in-Picture" title="Picture-in-Picture">&#9714; Pip</span>
       <span class="contextAbout" role="menuitem" aria-label="About">&#10082; About</span>
-      <span class="contextAboutWindow"><a href="https://${aboutUrl}" target="_blank" title="@${aboutUrl}">Open Source Player v1.5</a></span>
+      <span class="contextAboutWindow"><a href="https://${aboutUrl}" target="_blank" title="@${aboutUrl}">Open Source Player v1.6</a></span>
     </div>
   `;
   videoPlayerContainer.insertAdjacentHTML('beforeend', contextMenuHtml);

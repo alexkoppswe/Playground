@@ -2,9 +2,6 @@
   1. Reset & Root CSS
   2. Global styles
   3. Media player styles
-  
-  * NOTE: this css file is OPTIONAL and a example.
-  * and the dark mode is optional and a example.
   ============================== */
 
 /* Reset */
@@ -18,42 +15,12 @@
   list-style: none;
 }
 
-/* Root styles */
-:root {
-  --background-color: #ffffff;
-  --text-color: #000000;
-}
-
-/* Styles for dark mode */
-[data-theme='dark'] {
-  --background-color: #1e1e1e;
-  --text-color: #ffffff;
-}
-
-[data-theme='light'] {
-  --background-color: #ffffff;
-  --text-color: #000000;
-}
-
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: #121212;
-    --text-color: #ffffff;
-  }
-}
-
 /* Global styles */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100vh;
-}
-
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
 }
 
 footer {

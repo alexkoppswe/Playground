@@ -21,6 +21,7 @@ import { config } from './OpenSourcePlayer.js';
 import { states } from './stateMachine.js';
 import { mouseMoveTimer } from './mouseEvents.js';
 
+// Helper to get the state machine instance
 function getPlayerStateMachine(videoElement) {
   const playerContainer = videoElement.closest('.osp-player');
   return playerContainer?.stateMachine;
@@ -189,17 +190,15 @@ export async function prefetchNextSegment(video) {
   if (!video) return;
 
   const nextSegmentUrl = video.getAttribute('src');
-  if (!nextSegmentUrl || (video.buffered.length > 0 && video.buffered.end(0) > video.currentTime)) {
-    return;
-  }
-
-  try {
-    const cache = await caches.open('video-buffer');
-    cache.add(nextSegmentUrl).catch(error => {
-      console.error('Error prefetching video segment:', error);
-    });
-  } catch (error) {
-    console.error('Error opening cache for video segment:', error);
+  if (nextSegmentUrl && (video.buffered.length === 0 || video.buffered.end(0) <= video.currentTime)) {
+    try {
+      const cache = await caches.open('video-buffer');
+      cache.add(nextSegmentUrl).catch(error => {
+        console.error('Error prefetching video segment:', error);
+      });
+    } catch (error) {
+      console.error('Error opening cache for video segment:', error);
+    }
   }
 }
 

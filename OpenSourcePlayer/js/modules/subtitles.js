@@ -36,7 +36,6 @@ export async function loadSubtitle(video, subtitlePath) {
     subtitleSource.src = subtitlePath;
     subtitleSource.default = true;
     subtitleSource.mode = "hidden";
-    // Set the default language to "en"
     subtitleSource.srclang = "en";
     subtitleSource.label = "English";
 
@@ -71,7 +70,13 @@ async function fetchSubtitle(subtitleUrl) {
     if (cachedResponse) {
       return cachedResponse.text();
     } else {
-      const response = await fetch(subtitleUrl, { mode: 'cors', cache: 'force-cache' });
+      const response = await fetch(subtitleUrl, {
+        mode: 'cors',
+        cache: 'force-cache',
+        headers: {
+          'Accept-Encoding': 'br, gzip, deflate, compress, text/plain'
+        }
+      });
       if (!response.ok) {
         throw new Error(`Failed to fetch ${subtitleUrl}: ${response.status} ${response.statusText}`);
       }

@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Player</title>
+  <title>Open Source Player</title>
   <link rel="preload" href="css/OpenSourcePlayer.css" as="style" type="text/css">
   <link rel="prefetch" href="assets/icons.svg" as="image" type="image/svg+xml">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/OpenSourcePlayer.css" defer>
-  <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="assets/favicon.webp" type="image/webp">
+  <script type="module" src="js/modules/preload.js" async></script>
 </head>
 <body>
   
   <main>
-    <h1>Open Source Media Player</h1>
+    <h1>Open Source Player</h1>
     <div class="osp-player">
       <!-- Subtitles data tag: <video data-subtitle-src="./subtitles.vtt">-->
       <video>
@@ -21,11 +22,16 @@
         Sorry, Your browser does not support html video. Try updating it.
       </video>
     </div>
+
+    <div class="osp-player">
+      <video data-plugId='1'><!-- Plug.js use Example -->
+        <source src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4" crossorigin="anonymous">
+      </video>
+    </div>
   </main>
 
   <footer>CopyLeft</footer>
 
-  <script type="module" src="js/modules/preload.js" async></script>
-  <script type="module" src="script.js" defer></script>
+  <script type="module" src="js/script.js" defer></script>
 </body>
 </html>

@@ -9,6 +9,7 @@
     -Controls
     -Media Source
     -Event listeners
+    -Plug
   4. Video player setup function
     -Sources setup
     -MediaSource setup
@@ -20,21 +21,24 @@
     -External source/url check
   ================================ */
 
-import { setupVideoControls } from './controls.js';
+import { setupVideoControls, removeVideoControls } from './controls.js';
 import { addEventListeners } from './eventListeners.js';
 import { StateMachine, states } from './stateMachine.js';
+import { initializeContextMenu } from './contextMenu.js';
+import { plug } from './videoPlug.js';
 
 // Global Configuration
 const config = {
   mouseEvent: true,
   useSvgIcons: true,
   useMediaSource: false,
-  useSubtitles: true,
+  useSubtitles: false,
   useSettings: true,
   useContextMenu: true,
-  useVerticalVidFill: true,
+  useVerticalVidFill: false,
   useCinematicMode: true,
   useFastForward: true,
+  usePlug: false,
   debugger: false
 };
 
@@ -44,6 +48,12 @@ const playerInstances = new Map();
 async function generateUniqueOpid() {
   return `osp-${crypto.getRandomValues(new Uint32Array(1))[0]}`;
 }
+
+// Helper function to prevent context menu
+const preventContextMenu = (event) => {
+  event.preventDefault();
+  if (config.debugger) console.log('Context menu temporarily blocked by Plug.');
+};
 
 // --- Helper Function to Show Error on Player UI ---
 function displayPlayerError(playerContainer, message) {
@@ -57,12 +67,6 @@ function displayPlayerError(playerContainer, message) {
   if (loadingDisplay) {
     loadingDisplay.style.display = 'none';
   }
-  // Optional: Disable controls container visually
-  const controlsOutter = playerContainer?.querySelector('.osp-controls-outter');
-  if (controlsOutter) {
-    controlsOutter.style.opacity = '0.5';
-    controlsOutter.style.pointerEvents = 'none';
-  }
 }
 
 // Initialize player
@@ -70,8 +74,11 @@ export async function initializePlayer() {
   try {
     const players = document.querySelectorAll('.osp-player');
     await Promise.all(Array.from(players).map(async (player) => {
-      const opid = player.getAttribute('opid') || await generateUniqueOpid();
-      player.setAttribute('opid', opid);
+      let opid = player.getAttribute('opid');
+      if (!opid) {
+        opid = await generateUniqueOpid();
+        player.setAttribute('opid', opid);
+      }
 
       const video = player.querySelector('video');
       const audio = player.querySelector('audio');
@@ -114,33 +121,58 @@ export async function initializePlayer() {
       if (sources.length === 0 && !initialSrcAttr) {
         if (config.debugger) console.warn(`Player ${opid}: No <source> elements or src attribute found.`);
         playerStateMachine.setState('playback', states.ERROR);
+        removeVideoControls(player);
         displayPlayerError(player, "No valid media source found.");
         return;
       }
 
       // Determine the first source URL to check
-      let firstSourceUrl = initialSrcAttr;
-      if (!firstSourceUrl && sources.length > 0 || typeof firstSourceUrl !== 'string') {
-        firstSourceUrl = sources[0].getAttribute('src');
-      }
+      let firstSourceUrl = initialSrcAttr || sources[0]?.getAttribute('src');
 
       if (!firstSourceUrl) {
         if (config.debugger) console.warn(`Player ${opid}: Could not determine an initial source URL.`);
         playerStateMachine.setState('playback', states.ERROR);
+        removeVideoControls(player);
         displayPlayerError(player, "No valid media source found.");
         return;
       }
 
       // Event Listeners and Load Setup
       if (video) {
-        /* Example to set video attributes
-        video.setAttribute('playsinline', true); */
+        /* Add extra video attributes if needed.
+        video.setAttribute('playsinline', true);
+        video.setAttribute('controlsList', 'nodownload');
+        video.setAttribute('nodownload', '');*/
 
+        // Video plug
+        let plugWasShownAndCompleted = false;
+        if (config.usePlug === true && video.hasAttribute('data-plugId')) {
+          video.addEventListener('contextmenu', preventContextMenu);
+          try {
+            plugWasShownAndCompleted = await plug(video, opid);
+          } catch (plugError) {
+            console.error(`Player ${opid}: Error during plug execution:`, plugError);
+            plugWasShownAndCompleted = false;
+          } finally {
+            video.removeEventListener('contextmenu', preventContextMenu);
+
+            if (!plugWasShownAndCompleted) {
+              console.error(`Player ${opid}: Video plug failed to load.`);
+              return;
+            }
+          }
+        }
+        
+        // Initialize context menu
+        initializeContextMenu(video, player, controls.videoControls);
+        
+        // Set up the video player
         const setupResult = await videoPlayerSetup(video, sources);
         if (!setupResult) {
           playerStateMachine.setState('playback', states.ERROR);
         }
         
+        // Add main event listeners
         if (playerStateMachine.getState('playback') !== states.ERROR) {
           await addEventListeners(video, player, controls, playerStateMachine);
         } else {
@@ -200,7 +232,7 @@ export async function videoPlayerSetup(video, sources) {
 
     // Set preload to 'none' if a poster is set
     const posterSrc = video.getAttribute('poster');
-    if (posterSrc && posterSrc !== '') {
+    if (posterSrc && typeof posterSrc !== 'string') {
       video.preload = 'none';
     }
 
@@ -229,6 +261,7 @@ export async function videoPlayerSetup(video, sources) {
         if (config.debugger) console.error(`Player ${opid}: Failed to load subtitle module.`, subError);
       }
     }
+
     return true;
   } catch (error) {
     console.error(`Player ${opid}: Error during video player setup.`, error);
@@ -236,13 +269,13 @@ export async function videoPlayerSetup(video, sources) {
   }
 }
 
-// Example of how to clean up the player.
+// Clean up the player.
 export function destroyPlayer(opid) {
   const instanceInfo = playerInstances.get(opid) || null;
-  if (instanceInfo) {
+  if (instanceInfo && instanceInfo.player) {
     instanceInfo.stateMachine.clearListeners();
-    instanceInfo.player.remove();
     playerInstances.delete(opid);
+    instanceInfo.player.remove();
   }
 }
 

@@ -126,7 +126,7 @@ export async function updateSeekerBarVisuals(video, seekerBar, playerStateMachin
   await updateSliderBackground(seekerBar);
 }
 
-// Updates the background & the seekers 'head'.
+// Updates the background left of the seekers 'head'.
 export async function updateSliderBackground(slider) {
   if (!slider || !slider.isConnected) return;
   
@@ -157,6 +157,7 @@ export async function updateSliderBackground(slider) {
     visualPercentage = percentage;
   }
 
+  // Round the visual percentage to avoid floating point issues
   if (visualPercentage >= 98.7) {
     visualPercentage = 100.0;
   } else if (visualPercentage <= 1.1) {
@@ -166,7 +167,7 @@ export async function updateSliderBackground(slider) {
 
   // Rounded corners for the seeker bar at start/end
   if (slider.classList.contains('osp-seeker-bar')) {
-    if (visualPercentage <= 1.1) {
+    if (visualPercentage <= 0.9) {
       slider.style.borderRadius = '5px 0 0 5px';
     } else if (visualPercentage >= 99.1) {
       slider.style.borderRadius = '0 5px 5px 0';
@@ -207,6 +208,7 @@ export async function updateSvgIcons(video, controls, svgIcons, playerStateMachi
   if (!video || !controls || !playerStateMachine) return;
 
   const playbackState = playerStateMachine.getState('playback');
+  //const volumeState = playerStateMachine.getState('volume');  volumeState === states.MUTED || 
   const isFullscreenActive = playerStateMachine.getState('display') === states.FULLSCREEN;
   const cinematicState = playerStateMachine.getState('visualMode')  === states.CINEMATIC_MODE;
 

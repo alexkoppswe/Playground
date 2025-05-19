@@ -6,14 +6,16 @@
   3. Create player UI function
   4. Insert SVG icons function
   5. Set button text content function
+  6. Remove video controls function
   ==================================== */
 
 import { config } from './OpenSourcePlayer.js';
-import { initializeContextMenu } from './contextMenu.js';
 import { updateButtonIcon } from './uiUpdates.js';
 
-// SVG icons paths
-const iconPath = 'assets/icons.svg';
+// SVG icons path
+export const iconPath = 'assets/icons.svg';
+
+// SVG icons
 export const svgIcons = {
   src: iconPath,
   play: `${iconPath}#icon-play`,
@@ -46,8 +48,11 @@ export async function setupVideoControls(video, playerContainer) {
       throw new Error("Video controls not found");
     }
 
+    if (controls.videoControls) {
+      controls.videoControls.style.opacity = 0;
+    }
+
     if (!config.useSettings && controls.settingsButton || video.tagName === 'AUDIO') controls.settingsButton.style.display = 'none';
-    if (config.useContextMenu && video.tagName === 'VIDEO') initializeContextMenu(video, playerContainer, controls.videoControls);
     if (!config.useCinematicMode && controls.cinematicModeBtn) controls.cinematicModeBtn.style.display = 'none';
     if (!config.useFastForward && controls.fastForwardBtn) controls.fastForwardBtn.style.display = 'none';
 
@@ -62,6 +67,10 @@ export async function setupVideoControls(video, playerContainer) {
       insertSvgIcons(controls); // Insert SVG icons
     } else {
       setButtonTextContent(controls); // Set Text content
+    }
+
+    if (controls.videoControls) {
+      controls.videoControls.style.opacity = 1;
     }
 
     return controls;
@@ -82,7 +91,7 @@ async function createPlayerUI(playerContainer) {
           <input class="osp-seeker-bar" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seeker" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         </div>
         <div class="osp-controls-inner">
-          <span class="osp-button osp-play-pause" role="button" tabindex="0" aria-label="Play"></span>
+          <span class="osp-button osp-play-pause" role="button" tabindex="0" aria-label="Play / Pause"></span>
           <span class="osp-button osp-fast-forward" role="button" tabindex="0" title="Fast Forward" aria-label="Fast Forward"></span>
           <span class="osp-timestamp" aria-live="off"><time datetime="PT0S">00:00</time></span>
           <span class="osp-button osp-mute" role="button" tabindex="0" title="Mute (M)" aria-label="Mute"></span>
@@ -189,5 +198,13 @@ async function setButtonTextContent(controls) {
   if (fastForwardBtn) {
     fastForwardBtn.innerHTML = '&#8635;';
     fastForwardBtn.setAttribute('aria-label', 'Fast Forward');
+  }
+}
+
+// Remove video controls
+export async function removeVideoControls(playerContainer) {
+  let videoControls = playerContainer.querySelector('.osp-controls-outter');
+  if (videoControls) {
+    videoControls.remove();
   }
 }

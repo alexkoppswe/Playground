@@ -14,6 +14,7 @@ export function handleMouseMove(video, videoControls) {
 
   showControls(video, videoControls);
   clearTimeout(mouseMoveTimer);
+  
   mouseMoveTimer = setTimeout(() => hideControls(video, videoControls), 3500);
   video.style.cursor = "auto";
 }

@@ -15,20 +15,20 @@
     <button class="start-button">Start Game</button>
     <label>
       <input type="checkbox" id="deal2cards-toggle">
-      House Rules
+      House Rules  <small>(The dealers 1st card is hidden & you can only stay once)</small>
     </label>    
     <label>
       <input type="checkbox" id="betting-system-toggle">
-      Enable Money Betting
+      Enable Money Betting  <small>(Simulate a betting system)</small>
     </label>
     <div id="money-input-container" style="display: none;">
       <label for="initial-money">Enter Starting Money ($):</label>
-      <input type="number" id="initial-money" min="0" max="1000000" placeholder="100">
+      <input type="number" id="initial-money" min="0" max="1000000" placeholder="0">
     </div>
     <!-- Add an info-box container to your HTML -->
     <div class="info-box">
       <h2>Rules of 21</h2>
-      <ul>
+      <ul class="rules-list">
         <li>The objective of the game is to get a hand value closest to 21 without going over.</li>
         <li>Numbered cards are worth their face value.</li>
         <li>Face cards (Jack, Queen, King) are worth 10 points.</li>
@@ -36,9 +36,22 @@
         <li>If your hand value exceeds 21, you "bust" and lose the game.</li>
         <li>If both you and the dealer have the same hand value and you stay, it's a tie.</li>
       </ul>
-      <h3>How to Play:</h3>
-      <p>You will be dealt two cards. The dealer will be dealt one card. Based on your hand value, you can choose to either "hit" to receive another card, or "stand" to stick with your current hand. If you go over 21, you lose. If the dealer's hand value is higher than yours, you lose. If your hand value is higher than the dealer's, you win!</p>
-      <p>You can choose to hit or stand by pressing the corresponding keys on your keyboard. <kbd>H</kbd> or <kbd>Space</kbd> for hit, <kbd>S</kbd> for stand. When any player wins or loses, press any of the buttons to start a new game.</p>
+    <details class="play-instructions">
+      <summary>How to Play</summary>
+      <p>
+        You will be dealt two cards. The dealer will be dealt one card.
+        Based on your hand value, you can choose to either "hit" to receive
+        another card, or "stand" to stick with your current hand. If you go
+        over 21, you lose. If the dealer's hand value is higher than yours,
+        you lose. If your hand value is higher than the dealer's, you win!
+      </p>
+    </details>
+      <h3>Keyboard Shortcuts:</h3>
+      <p class="keyboard-instructions">
+        <kbd>H</kbd> or <kbd>Space</kbd> = Hit<br>
+        <kbd>S</kbd> = Stand.
+        <br>When Game Over, press any of the buttons to start a new game.
+      </p>
     </div>
   </div>
   <div class="game-container">

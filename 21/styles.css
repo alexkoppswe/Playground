@@ -26,6 +26,7 @@ body {
   font-size: 1.1em;
 }
 
+#deal2cards-toggle,
 #betting-system-toggle {
   width: 1.2em;
   height: 1.2em;
@@ -286,34 +287,41 @@ h2 {
 }
 
 .info-box {
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 20px;
+  margin: 20px auto;
   background-color: #dfd7ca;
-  font: 1.1em Consolas, monospace;
+  font: 1.1em Helvetica, sans-serif;
   color: #1b1b1b;
   text-align: center;
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
 }
 
-.info-box ul {
+.rules-list {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.info-box li {
   margin-bottom: 10px;
 }
 
-.info-box p {
-  margin-bottom: 20px;
+.rules-list li {
+  margin-bottom: 10px;
 }
 
-.info-box h2,
-.info-box h3 {
-  margin-top: 0;
+.play-instructions,
+.keyboard-instructions {
+  margin: 0;
+}
+
+.play-instructions summary {
+  text-decoration: underline;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
 .info-box kbd {
@@ -434,6 +442,13 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  #deck-container {
+    top: auto;
+    bottom: 7vh;
+  }
 }
 
 #deck-count {

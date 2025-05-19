@@ -77,10 +77,22 @@ setState(key, value) {
   return false; // State did not change
 }
 
+/**
+ * Retrieves the current state for a given key.
+ * @param {string} key - The state category (e.g., 'playback', 'volume').
+ * @returns {string | undefined} - The current state value, or undefined if key doesn't exist.
+ */
 getState(key) {
   return this.#state[key];
 }
 
+/**
+ * Toggles a state between two specific values.
+ * @param {string} key - The state category (e.g., 'volume', 'loop').
+ * @param {string} value1 - The first state value (e.g., states.MUTED).
+ * @param {string} value2 - The second state value (e.g., states.UNMUTED).
+ * @returns {boolean} - True if the state was changed, false otherwise.
+ */
 toggleState(key, value1, value2) {
   if (!(key in this.#state)) {
     console.warn(`StateMachine: Attempted to toggle unknown state key "${key}"`);
@@ -97,6 +109,10 @@ toggleState(key, value1, value2) {
   return false;
 }
 
+/**
+ * Adds a listener function to be called when state changes.
+ * @param {function} listener - The callback function. Receives state key and new value.
+ */
 addListener(listener) {
   if (typeof listener === 'function') {
     this.#listeners.add(listener);
@@ -105,10 +121,20 @@ addListener(listener) {
   }
 }
 
+/**
+ * Removes a listener function.
+ * @param {function} listener - The callback function to remove.
+ */
 removeListener(listener) {
   this.#listeners.delete(listener);
 }
 
+/**
+ * Notifies all registered listeners about a state change.
+ * @param {string} key - The state key that changed.
+ * @param {string} value - The new state value.
+ * @private
+ */
 #notifyListeners(key, value) {
   this.#listeners.forEach(listener => listener(key, value, this.#state));
 }

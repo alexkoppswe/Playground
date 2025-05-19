@@ -2,18 +2,18 @@
 
 /*========// Event Listeners //=========
   1. Video loaded handler function 
-  2. Functions
+  2. Error event listeners
+  3. Functions
     -Video loaded function
     -Show message function
     -Show loading function
     -Max load time function
-  3. Initial UI update
-  4. Event listeners
+  4. Initial UI update
+  5. Event listeners
     -Vertical video fill event listener
-  5. Mouse event listeners
-  6. Video event listeners
-  7. Loading video event listeners
-  8. Error event listeners
+  6. Mouse event listeners
+  7. Video event listeners
+  8. Loading video event listeners
   9. Button click event listeners
   10. Volume & seeker-bar event listeners
   11. Keyboard shortcuts event listener
@@ -21,6 +21,7 @@
 
 import { config, destroyPlayer } from './OpenSourcePlayer.js';
 import { debounce } from './utils.js';
+import { removeVideoControls } from './controls.js';
 import { states } from './stateMachine.js';
 import { handleMouseMove, showControls, mouseMoveTimer } from './mouseEvents.js';
 import { updateUI, updateSliderBackground, checkIfVertical, resizeCanvas, renderCanvas, updateTimestamps, updateSeekerBarVisuals } from './uiUpdates.js';
@@ -38,6 +39,49 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
 
   const opid = mediaContainer.getAttribute('opid');
   mediaContainer.setAttribute('tabindex', '-1');
+
+  //  Errors
+  video.addEventListener('error', (event) => {
+    const mediaError = event.target.error;
+    playerStateMachine.setState('playback', states.ERROR);
+
+    let errorMessage;
+    switch (mediaError.code) {
+      case mediaError.MEDIA_ERR_ABORTED:
+        errorMessage = 'The fetching process for the media resource was aborted by the user.';
+        break;
+      case mediaError.MEDIA_ERR_NETWORK:
+        errorMessage = 'A network error occurred while fetching the media resource.';
+        break;
+      case mediaError.MEDIA_ERR_DECODE:
+        errorMessage = 'The media resource could not be decoded.';
+        break;
+      case mediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+        errorMessage = 'The media resource is not supported.';
+        break;
+      case mediaError.MEDIA_ERR_ENCRYPTED:
+        errorMessage = 'The media resource is encrypted and cannot be used.';
+        break;
+      case mediaError.MEDIA_ERR_INVALID_STATE:
+        errorMessage = 'The media resource is in an invalid state.';
+        break;
+      case mediaError.NS_ERROR_DOM_MEDIA_METADATA_ERR:
+        errorMessage = 'A metadata error occurred while fetching the media resource.';
+        break;
+      default:
+        errorMessage = 'An error occurred while loading the video.';
+        if (config.debugger) errorMessage = `Video error: ${mediaError}`;
+        break;
+    }
+
+    if (config.debugger) console.warn(errorMessage, `Player ID: ${opid}`);
+
+    removeVideoControls(mediaContainer);
+
+    requestAnimationFrame(() => updateUI(video, controls, playerStateMachine));
+    showMessage(errorMessage);
+    return;
+  });
 
   // Video loaded event
   async function videoLoaded() {
@@ -68,7 +112,7 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
     messageDisplay.textContent = message;
     video.removeAttribute('poster');
 
-    // Optional: Disable controls container visually.
+    // Optional: Disable controls container visually
     const controlsOutter = mediaContainer?.querySelector('.osp-controls-outter');
     if (controlsOutter) {
       controlsOutter.style.opacity = '0.5';
@@ -77,10 +121,14 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
   }
 
   function showLoading() {
+    playerStateMachine.setState('playback', states.LOADING);
     messageDisplay.textContent = '';
-    setTimeout(() => {
-      loadingDisplay.style.display = 'block';
-    }, 100);
+
+    if (video.tagName === 'VIDEO') {
+      setTimeout(() => {
+        loadingDisplay.style.display = 'block';
+      }, 100);
+    }
   }
 
   // Set timeout for stalled error
@@ -169,8 +217,7 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
     });
 
     video.addEventListener('pause', () => {
-      if (playerStateMachine.getState('playback') !== states.ENDED &&
-        playerStateMachine.getState('seeking') !== states.SEEKING) {
+      if (playerStateMachine.getState('playback') !== states.ENDED && playerStateMachine.getState('seeking') !== states.SEEKING) {
         playerStateMachine.setState('playback', states.PAUSED);
       }
       requestAnimationFrame(() => updateUI(video, controls, playerStateMachine));
@@ -184,65 +231,19 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
       } else if (playerStateMachine.getState('seeking') === states.SEEKING) {
         updateTimestamps(video, controls);
       }
-      updateSliderBackground(controls.seekerBar);
+      updateSliderBackground(seekerBar);
     });
 
     // Loading video
     video.addEventListener('stalled', () => showLoading());
-
-    video.addEventListener("loadstart", () => {
-      playerStateMachine.setState('playback', states.LOADING);
-      showLoading();
-    });
+    video.addEventListener("loadstart", () => showLoading());
 
     video.addEventListener('waiting', () => {
       const currentState = playerStateMachine.getState('playback');
       if (currentState === states.PLAYING || currentState === states.SEEKING || currentState === states.LOADING) {
-        playerStateMachine.setState('playback', states.LOADING);
-        loadingDisplay.style.display = 'block';
+        showLoading();
         maxLoadTime();
       }
-    });
-
-    //  Errors
-    video.addEventListener('error', (event) => {
-      const mediaError = event.target.error;
-      playerStateMachine.setState('playback', states.ERROR);
-
-      let errorMessage;
-      switch (mediaError.code) {
-        case mediaError.MEDIA_ERR_ABORTED:
-          errorMessage = 'The fetching process for the media resource was aborted by the user.';
-          break;
-        case mediaError.MEDIA_ERR_NETWORK:
-          errorMessage = 'A network error occurred while fetching the media resource.';
-          break;
-        case mediaError.MEDIA_ERR_DECODE:
-          errorMessage = 'The media resource could not be decoded.';
-          break;
-        case mediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-          errorMessage = 'The media resource is not supported.';
-          break;
-        case mediaError.MEDIA_ERR_ENCRYPTED:
-          errorMessage = 'The media resource is encrypted and cannot be used.';
-          break;
-        case mediaError.MEDIA_ERR_INVALID_STATE:
-          errorMessage = 'The media resource is in an invalid state.';
-          break;
-        case mediaError.NS_ERROR_DOM_MEDIA_METADATA_ERR:
-          errorMessage = 'A metadata error occurred while fetching the media resource.';
-          break;
-        default:
-          errorMessage = 'An error occurred while loading the video.';
-          if (config.debugger) errorMessage = `Video error: ${mediaError}`;
-          break;
-      }
-
-      if (config.debugger) console.warn(errorMessage, `Player ID: ${opid}`);
-
-      requestAnimationFrame(() => updateUI(video, controls, playerStateMachine));
-      showMessage(errorMessage);
-      return;
     });
 
     // Button clicks
@@ -264,7 +265,11 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
         } else if (target === settingsButton || target.closest('.osp-settings-button')) {
           toggleSettingsMenu(video, settingsMenu, settingsButton);
         } else if (target === fastForwardBtn || target.closest('.osp-fast-forward')) {
-          if (config.useFastForward) skipForward(video);
+          if (config.useFastForward) {
+            skipForward(video);
+            requestAnimationFrame(() => updateUI(video, controls, playerStateMachine));
+            prefetchNextSegment(video);
+          }
         }
   
         requestAnimationFrame(() => updateUI(video, controls, playerStateMachine));
@@ -283,11 +288,11 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
 
     seekerBar.addEventListener('mousedown', () => {
       if (!isNaN(video.duration) && video.duration > 0) {
-          playerStateMachine.setState('seeking', states.SEEKING);
-          if (playerStateMachine.getState('playback') === states.PLAYING) {
-              video.pause();
-          }
-          window.addEventListener('mouseup', handleSeekMouseUp, true);
+        playerStateMachine.setState('seeking', states.SEEKING);
+        if (playerStateMachine.getState('playback') === states.PLAYING) {
+          video.pause();
+        }
+        window.addEventListener('mouseup', handleSeekMouseUp, true);
       }
     });
 
@@ -373,7 +378,7 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
 
       requestAnimationFrame(() => updateUI(video, controls, playerStateMachine));
     });
-    
+
     // Keyboard Shortcuts for Seekbar
     seekerBar.addEventListener('keydown', (event) => {
       if (document.activeElement !== mediaContainer && !mediaContainer.contains(document.activeElement)) return;
@@ -405,7 +410,7 @@ export async function addEventListeners(video, mediaContainer, controls, playerS
           break;
       }
     });
-
+    
   } catch (error) {
     console.error('An error occurred:', error);
     showMessage('An error occurred while loading the video.');
