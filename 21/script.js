@@ -20,6 +20,10 @@ let deckCount = 52;
 let deal2cards = false;  // Rigged House Rules
 let isDealerFirstCardHidden = true;
 
+const Sound_File_Card = new Audio('dealcard.mp3');
+const Sound_File_Win = ''; //new Audio('win.mp3');
+//const SOUND_VOLUME = 0.5;
+
 let bettingEnabled = false;
 let playerMoney = 0;
 let dealerMoney = 10000;
@@ -282,6 +286,7 @@ async function dealCard(hand, containerSelector, isHidden = false) {
   }
 
   animateDeckColor(card.suit);
+  Sound_File_Card.play(); // Play the sound when a card is dealt
 
   cardElement.classList.add('deal-animation');
   document.querySelector(containerSelector).appendChild(cardElement);
@@ -494,6 +499,10 @@ async function stand() {
   }
 }
 
+function playerWins() {
+  if (Sound_File_Win) Sound_File_Win.play();
+}
+
 function checkGameOver() {
   const dealerValue = calculateHandValue(dealerHand);
   const playerValue = calculateHandValue(playerHand);
@@ -510,6 +519,7 @@ function checkGameOver() {
       gameOver = true;
     } else if (dealerValue > 21) {
       resultMessage = 'Dealer busted. You win!';
+      playerWins();
       if (bettingEnabled) {
         playerMoney += currentBet * 2;
       } else {
@@ -518,6 +528,7 @@ function checkGameOver() {
       gameOver = true;
     } else if (playerValue === 21) {
       resultMessage = 'You got a Blackjack! You win!';
+      playerWins();
       if (bettingEnabled) {
         playerMoney += Math.round(currentBet * 2.5); // Blackjack payout
         dealerMoney -= Math.round(currentBet * 2.5);
@@ -535,6 +546,7 @@ function checkGameOver() {
       gameOver = true;
     } else if (dealerValue < playerValue && playerValue <= 20 && dealerValue > dealerStopAt) {
       resultMessage = 'You win!';
+      playerWins();
       if (bettingEnabled) {
         playerMoney += currentBet * 2;
       } else {

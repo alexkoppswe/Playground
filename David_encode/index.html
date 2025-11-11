@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Visual Data Encoder</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="shortcut icon" href="fav.webp" type="image/webp">
+</head>
+<body>
+  <div class="main-wrapper">
+  <div class="container" id="container">
+    <button id="toggle-info">Show Info</button>
+    <h1>Visual Data Encoder</h1>
+
+    <textarea id="input" placeholder="Enter text to encode..."></textarea>
+
+    <div class="controls">
+      <fieldset>
+        <legend>Settings</legend>
+        <label for="mode">Color Mode:</label>
+        <select id="mode">
+          <option value="rgb">RGB</option>
+          <option value="bw">Black & White</option>
+          <option value="hidden-noise">Hidden Noise</option>
+        </select>
+
+        <label for="algorithm">Algorithm:</label>
+        <select id="algorithm">
+          <option value="standard">Standard</option>
+          <option value="password">Password</option>
+        </select>
+        
+        <label for="passphrase">Passphrase:</label>
+        <input type="text" id="passphrase" placeholder="Required for password algorithm">
+      </fieldset>
+
+      <fieldset>
+        <legend>Actions</legend>
+        <button id="encode-button">Encode</button>
+        <button id="decode-button">Decode</button>
+        <button id="download-button">Download Image</button>
+        <button id="reset-button">Reset</button>
+        <hr style="border: 0px transparent;" />
+        <label for="file-upload" class="upload-btn">📤 Upload Image
+          <input type="file" id="file-upload" accept="image/*" onchange="loadImage(event)">
+        </label>
+      </fieldset>
+    </div>
+
+    <fieldset>
+      <legend>Image</legend>
+      <canvas id="canvas"></canvas>
+    </fieldset>
+
+    <p>
+      <label for="key">Key (coords):</label>
+      <input type="text" id="key"><!-- readonly -->
+    </p>
+
+    <div class="output">
+      <strong>Decoded:</strong> <span id="output"></span>
+    </div>
+  </div>
+
+
+    <div class="sidebar" id="sidebar">
+      <h2>About this Tool</h2>
+      <section>
+        <h3>Usability</h3>
+        <p>This tool allows you to encode text data into an image and decode it back. It supports different color modes (RGB, Black & White, Hidden Noise) and an optional password-based obfuscation algorithm. This can be useful for:</p>
+        <ul>
+          <li><strong>Steganography:</strong> Hiding messages within seemingly innocuous images.</li>
+          <li><strong>Data Transfer:</strong> Sharing small pieces of text data in an image format.</li>
+          <li><strong>Secure Notes:</strong> Storing sensitive notes in an image that requires a passphrase to decode.</li>
+        </ul>
+      </section>
+      <section>
+        <h3>How-to Use</h3>
+        <ol>
+          <li><strong>Enter Text:</strong> Type or paste the text you want to encode into the "Enter text to encode..." area.</li>
+          <li><strong>Select Mode:</strong> Choose a <span class="mark">"Color Mode"</span>
+            <ul>
+              <li><strong>RGB:</strong> Each character's byte value is mapped to R, G, or B channels.</li>
+              <li><strong>Black & White:</strong> Each bit of a character is represented by a black or white pixel.</li>
+              <li><strong>Hidden Noise:</strong> Embeds data into a random noise image. Requires a <span class="mark">Passphrase</span> for decoding.</li>
+            </ul>
+          </li>
+          <li><strong>Select Algorithm:</strong> Choose <span class="mark">"Standard"</span> or <span class="mark">"Password"</span>. If "Password" is selected, enter a passphrase.</li>
+          <li><strong>Encode:</strong> Click the <span class="mark">"Encode"</span> button. The encoded image will appear on the canvas.</li>
+          <li><strong>Download (Optional):</strong> Click <span class="mark">"Download Image"</span> to save the image. If "Hidden Noise" mode is used, a <span class="mark">"Key File"</span> will also be downloaded.</li>
+          <li><strong>Decode:</strong> To decode, upload an image using "Upload Image". Select the correct "Algorithm" (and passphrase if applicable), then click "Decode". If it's a "Hidden Noise" image, enter the key from the downloaded key file in the "Key" field.</li>
+        </ol>
+      </section>
+    </div>
+  <script src="script.js"></script>
+</body>
+</html>
