@@ -2,6 +2,10 @@ const grid = document.getElementById('grid');
 const gridSize = 4;
 let board = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
 
+let touchStartX = 0;
+let touchStartY = 0;
+const gameContainer = document.getElementById('game-container'); // Get the game container
+
 // Initialize the game
 function initGame() {
   renderGridLines();
@@ -199,8 +203,47 @@ function checkGameOver() {
 // Listen for key presses
 window.addEventListener('keydown', (e) => {
   if (['ArrowUp', 'ArrowRight', 'ArrowDown', 'ArrowLeft'].includes(e.key)) {
+    e.preventDefault();
     move(e.key);
   }
+});
+
+// Touch support for swipe gestures
+gameContainer.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  e.preventDefault();
+});
+
+gameContainer.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+});
+
+gameContainer.addEventListener('touchend', (e) => {
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+
+  const deltaX = touchEndX - touchStartX;
+  const deltaY = touchEndY - touchStartY;
+
+  const minSwipeDistance = 30;
+
+  if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+    // Horizontal swipe
+    if (deltaX > 0) {
+      move('ArrowRight');
+    } else {
+      move('ArrowLeft');
+    }
+  } else if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > minSwipeDistance) {
+    // Vertical swipe
+    if (deltaY > 0) {
+      move('ArrowDown');
+    } else {
+      move('ArrowUp');
+    }
+  }
+  e.preventDefault();
 });
 
 initGame();
